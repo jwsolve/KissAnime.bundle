@@ -1,0 +1,57 @@
+import base64
+
+########################################################################################
+def NormalizeURL(url):
+
+	return url
+
+########################################################################################
+def MetadataObjectForURL(url):
+
+	page = HTML.ElementFromURL(url)
+
+	title = page.xpath("//option[@selected='selected']/text()")[0]
+	description = page.xpath("//meta[@name='description']/@content")[0]
+	thumb = page.xpath("//meta[@property='og:image']/@content")[0]
+
+	return VideoClipObject(
+		title = title,
+		summary = description,
+		thumb = thumb
+	)
+
+########################################################################################
+def MediaObjectsForURL(url):
+
+	return [
+        	MediaObject(
+			parts = [
+				PartObject(
+					key = 
+						Callback(
+							PlayVideo,
+							url = url,
+							fmt = 'hi',
+							post_url=url
+						)
+					)
+				],
+			video_resolution = 720,
+			bitrate = 3000,
+			container = Container.MP4,
+			video_codec = VideoCodec.H264,
+			audio_codec = AudioCodec.AAC,
+			audio_channels = 2,
+			optimized_for_streaming = True if Client.Product != 'Plex Web' else False
+			)
+	]
+
+########################################################################################
+@indirect
+def PlayVideo(url, fmt):
+
+
+	html = HTML.ElementFromURL(url)
+	video_url = html.xpath("//select[@id='selectQuality']/option[1]/@value")[0]
+
+	return IndirectResponse(VideoClipObject, key=base64.b64decode(video_url))
