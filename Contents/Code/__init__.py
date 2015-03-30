@@ -65,9 +65,8 @@ def ShowCartoons(title, url, page_count):
 
 	for each in html.xpath("//tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
-		thumbhtml = HTML.ElementFromURL(BASE_URL + url)
-		thumb = thumbhtml.xpath("//div[@class='barContent']/div/img/@src")[0]
-		title = thumbhtml.xpath("//a[@class='bigChar']/text()")[0]
+		thumb = ""
+		title = each.xpath("./a/text()")[0]
 		oc.add(DirectoryObject(
 			key = Callback(ShowEpisodes, title = title, url = url),
 				title = title,
@@ -90,9 +89,8 @@ def ShowEpisodes(title, url):
 	html = HTML.ElementFromURL(BASE_URL + url)
 	for each in html.xpath("//table[@class='listing']/tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
-		thumbhtml = HTML.ElementFromURL(BASE_URL + url)
-		title = thumbhtml.xpath("//option[@selected='selected']/text()")[0]
-		thumb = thumbhtml.xpath("//meta[@property='og:image']/@content")[0]
+		title = each.xpath("./a/text()")[0]
+		thumb = ""
 		oc.add(DirectoryObject(
 			key = Callback(EpisodeDetail, title = title, url = url),
 				title = title,
