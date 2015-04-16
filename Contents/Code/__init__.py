@@ -50,7 +50,6 @@ def MainMenu():
 	oc = ObjectContainer()
 	oc.add(InputDirectoryObject(key = Callback(Search), title='Search', summary='Search Kisscartoon', prompt='Search for...'))
 	pagehtml = html.fromstring(myrequest.text)
-	#html = HTML.ElementFromURL(BASE_URL + '/AnimeList')
 	for each in pagehtml.xpath("//div[@class='alphabet']/a"):
 		title = each.xpath("./text()")[0]
 		url = each.xpath("./@href")[0]
@@ -71,7 +70,6 @@ def Shows():
 	oc = ObjectContainer()
 	oc.add(InputDirectoryObject(key = Callback(Search), title='Search', summary='Search Kisscartoon', prompt='Search for...'))
 	pagehtml = html.fromstring(myrequest.text)
-	#html = myrequest.ElementFromURL(BASE_URL + '/AnimeList', headers=HTTP_HEADERS)
 
 	for each in page.xpath("//div[@class='alphabet']/a"):
 		title = each.xpath("./text()")[0]
@@ -95,8 +93,13 @@ def ShowCartoons(title, url, page_count):
 
 	for each in pagehtml.xpath("//tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
-		thumb = ""
-		title = each.xpath("./a/text()")[0]
+		thumbhtml = scraper.get(BASE_URL + url)
+		pagehtml = html.fromstring(thumbhtml.text)
+		title = pagehtml.xpath("//a[@class='bigChar']/text()")[0]
+		try:
+			thumb = pagehtml.xpath("//div[@class='barContent']/div/img/@src")[0]
+		except:
+			thumb = ICON_SERIES
 		oc.add(DirectoryObject(
 			key = Callback(ShowEpisodes, title = title, url = url),
 				title = title,
@@ -118,11 +121,12 @@ def ShowEpisodes(title, url):
 	oc = ObjectContainer(title1 = title)
 	page = scraper.get(BASE_URL + url)
 	pagehtml = html.fromstring(page.text)
+	thisurl = url
 
 	for each in pagehtml.xpath("//table[@class='listing']/tr/td[1]"):
+		title = each.xpath("./a/@title")[0].replace('Watch anime','',1).replace('online in high quality','',1)
+		thumb = ICON_SERIES
 		url = each.xpath("./a/@href")[0]
-		title = each.xpath("./a/text()")[0]
-		thumb = ""
 		oc.add(DirectoryObject(
 			key = Callback(EpisodeDetail, title = title, url = url),
 				title = title,
@@ -157,16 +161,17 @@ def EpisodeDetail(title, url):
 def Search(query):
 
 	oc = ObjectContainer(title2='Search Results')
-	data = HTTP.Request(SEARCH_URL + '?keyword=%s' % String.Quote(query, usePlus=True), headers="").content
+	searchdata = scraper.get(SEARCH_URL + '?keyword=%s' % String.Quote(query, usePlus=True))
 
-	html = HTML.ElementFromString(data)
+	pagehtml = html.fromstring(searchdata.text)
 
-	for each in html.xpath("//tr/td[1]"):
+	for each in pagehtml.xpath("//tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
-		thumbhtml = HTML.ElementFromURL(BASE_URL + url)
-		title = thumbhtml.xpath("//a[@class='bigChar']/text()")[0]
+		thumbhtml = scraper.get(BASE_URL + url)
+		pagehtml = html.fromstring(thumbhtml.text)
+		title = pagehtml.xpath("//a[@class='bigChar']/text()")[0]
 		try:
-			thumb = thumbhtml.xpath("//div[@class='barContent']/div/img/@src")[0]
+			thumb = pagehtml.xpath("//div[@class='barContent']/div/img/@src")[0]
 		except:
 			thumb = ICON_SERIES
 		oc.add(DirectoryObject(
