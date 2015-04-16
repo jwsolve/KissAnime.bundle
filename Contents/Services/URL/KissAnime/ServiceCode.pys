@@ -1,4 +1,17 @@
 import base64
+import os
+import sys
+from lxml import html
+
+try:
+	path = os.getcwd().split("?\\")[1].split('Plug-in Support')[0]+"Plug-ins/KissAnime.bundle/Contents/Code/Modules/KissAnime"
+except:
+	path = os.getcwd().split("Plug-in Support")[0]+"Plug-ins/KissAnime.bundle/Contents/Code/Modules/KissAnime"
+if path not in sys.path:
+	sys.path.append(path)
+
+import cfscrape
+scraper = cfscrape.create_scraper()
 
 ########################################################################################
 def NormalizeURL(url):
@@ -8,11 +21,12 @@ def NormalizeURL(url):
 ########################################################################################
 def MetadataObjectForURL(url):
 
-	page = HTML.ElementFromURL(url)
+	page = scraper.get(url)
+	pagehtml = html.fromstring(page.text)
 
-	title = page.xpath("//option[@selected='selected']/text()")[0]
-	description = page.xpath("//meta[@name='description']/@content")[0]
-	thumb = page.xpath("//meta[@property='og:image']/@content")[0]
+	title = pagehtml.xpath("//option[@selected='selected']/text()")[0]
+	description = pagehtml.xpath("//meta[@name='description']/@content")[0]
+	thumb = pagehtml.xpath("//meta[@property='og:image']/@content")[0]
 
 	return VideoClipObject(
 		title = title,
@@ -47,11 +61,10 @@ def MediaObjectsForURL(url):
 	]
 
 ########################################################################################
-@indirect
 def PlayVideo(url, fmt):
 
+	page = scraper.get(url)
+	pagehtml = html.fromstring(page.text)
+	video_url = pagehtml.xpath("//select[@id='selectQuality']/option[1]/@value")[0]
 
-	html = HTML.ElementFromURL(url)
-	video_url = html.xpath("//select[@id='selectQuality']/option[1]/@value")[0]
-
-	return IndirectResponse(VideoClipObject, key=base64.b64decode(video_url))
+	return Redirect(base64.b64decode(video_url))
