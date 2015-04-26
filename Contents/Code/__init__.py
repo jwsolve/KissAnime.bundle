@@ -49,6 +49,19 @@ def MainMenu():
 
 	oc = ObjectContainer()
 	oc.add(InputDirectoryObject(key = Callback(Search), title='Search', summary='Search Kisscartoon', prompt='Search for...'))
+	oc.add(DirectoryObject(key = Callback(AToZ), title = "A to Z"))
+	oc.add(DirectoryObject(key = Callback(LatestEpisodes, title="Latest Updates", url = '/LatestUpdate/', page_count = 1), title = "Latest Updates"))
+	oc.add(DirectoryObject(key = Callback(LatestEpisodes, title="Most Popular", url = '/MostPopular/', page_count = 1), title = "Most Popular"))
+	oc.add(DirectoryObject(key = Callback(LatestEpisodes, title="New Anime", url = '/Newest/', page_count = 1), title = "New Anime"))
+	return oc
+
+######################################################################################
+# Alphabetical list
+
+@route(PREFIX + "/atoz")
+def AToZ():
+
+	oc = ObjectContainer()
 	pagehtml = html.fromstring(myrequest.text)
 	for each in pagehtml.xpath("//div[@class='alphabet']/a"):
 		title = each.xpath("./text()")[0]
@@ -81,6 +94,35 @@ def Shows():
 				)
 		)
 	return oc
+
+######################################################################################
+@route(PREFIX + "/showcartoons")	
+def LatestEpisodes(title, url, page_count):
+
+	oc = ObjectContainer(title1 = title)
+	thisurl = url
+	thistitle = title
+	page = scraper.get(BASE_URL + '/AnimeList' + url + '?page=' + page_count)
+	pagehtml = html.fromstring(page.text)
+
+	for each in pagehtml.xpath("//tr/td[1]"):
+		url = each.xpath("./a/@href")[0]
+		title = each.xpath("./a/text()")[0]
+		thumb = ""
+		oc.add(DirectoryObject(
+			key = Callback(ShowEpisodes, title = title, url = url),
+				title = title,
+				thumb = thumb
+				)
+		)
+	oc.add(NextPageObject(
+		key = Callback(ShowCartoons, url = thisurl, title = thistitle, page_count = int(page_count) + 1),
+		title = "More...",
+		thumb = R(ICON_NEXT)
+			)
+		)
+	return oc
+
 ######################################################################################
 @route(PREFIX + "/showcartoons")	
 def ShowCartoons(title, url, page_count):
@@ -164,7 +206,6 @@ def Search(query):
 	searchdata = scraper.get(SEARCH_URL + '?keyword=%s' % String.Quote(query, usePlus=True))
 
 	pagehtml = html.fromstring(searchdata.text)
-
 	for each in pagehtml.xpath("//tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
 		thumbhtml = scraper.get(BASE_URL + url)
