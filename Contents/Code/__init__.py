@@ -96,7 +96,7 @@ def Shows():
 	return oc
 
 ######################################################################################
-@route(PREFIX + "/showcartoons")	
+@route(PREFIX + "/latestepisodes")	
 def LatestEpisodes(title, url, page_count):
 
 	oc = ObjectContainer(title1 = title)
@@ -131,15 +131,15 @@ def ShowCartoons(title, url, page_count):
 	thisurl = url
 	thisletter = url.split("=",1)[1]
 	page = scraper.get(BASE_URL + '/AnimeList' + url + '&page=' + page_count)
-	pagehtml = html.fromstring(page.text)
+	htmlpage = html.fromstring(page.text)
 
-	for each in pagehtml.xpath("//tr/td[1]"):
+	for each in htmlpage.xpath("//tr/td[1]"):
 		url = each.xpath("./a/@href")[0]
 		thumbhtml = scraper.get(BASE_URL + url)
-		pagehtml = html.fromstring(thumbhtml.text)
-		title = pagehtml.xpath("//a[@class='bigChar']/text()")[0]
+		page_html = html.fromstring(thumbhtml.text)
+		title = page_html.xpath("//a[@class='bigChar']/text()")[0]
 		try:
-			thumb = pagehtml.xpath("//div[@class='barContent']/div/img/@src")[0]
+			thumb = page_html.xpath("//div[@class='barContent']/div/img/@src")[0]
 		except:
 			thumb = ICON_SERIES
 		oc.add(DirectoryObject(
