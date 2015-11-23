@@ -11,8 +11,8 @@ ICON_SERIES = "icon-default.png"
 ICON_NEXT = "icon-next.png"
 ICON_QUEUE = "icon-cover.png"
 ART = "art-default.jpg"
-BASE_URL = "http://kissanime.com"
-SEARCH_URL = "http://kissanime.com/Search/Anime"
+BASE_URL = "http://kissanime.to"
+SEARCH_URL = "http://kissanime.to/Search/Anime"
 
 import os
 import sys

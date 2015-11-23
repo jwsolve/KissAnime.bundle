@@ -8,6 +8,7 @@
       <key>URLPatterns</key>
       <array>
         <string>http://kissanime.com/</string>
+        <string>http://kissanime.to/</string>
       </array>
     </dict>
   </dict>
