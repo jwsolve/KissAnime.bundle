@@ -21,7 +21,7 @@ System Requirements
 How To Install
 ==============
 
-- [Download](https://github.com/jwsolve/KissAmine.bundle/archive/master.zip) the latest version of the plugin.
+- [Download](https://github.com/jwsolve/KissAnime.bundle/archive/master.zip) the latest version of the plugin.
 
 - Unzip and rename folder to "KissAnime.bundle"
 
